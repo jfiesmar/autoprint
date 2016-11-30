@@ -1,4 +1,4 @@
-
+package autoprint;
 import java.io.File;
 import javax.print.*;
 import javax.print.attribute.HashPrintRequestAttributeSet;
@@ -15,6 +15,7 @@ public class AutoPrint {
 
     public final String DIRECTORIO = "C:/autoprint";
     public final String FORMATO = ".pdf";
+    private final int SLEEP_TIME = 10;
     FilenameFilter filter;
 
     public AutoPrint() {
@@ -41,11 +42,18 @@ public class AutoPrint {
     }
 
     public void iniciarDemonio() throws IOException {
-        File[] listaFicheros = listarDirectorio();
-        for (File fichero : listaFicheros) {
-            System.out.println(fichero);
-            imprimir(fichero);
-            borrarFichero(fichero);
+        while (true) {
+            File[] listaFicheros = listarDirectorio();
+            for (File fichero : listaFicheros) {
+                System.out.println(fichero);
+                imprimir(fichero);
+                borrarFichero(fichero);
+            }
+            try {
+                TimeUnit.SECONDS.sleep(SLEEP_TIME);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(AutoPrint.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
     }
@@ -93,16 +101,7 @@ public class AutoPrint {
     public static void main(String args[]) throws IOException {
 
         AutoPrint ap = new AutoPrint();
-
-        while (true) {
-            ap.iniciarDemonio();
-            try {
-                TimeUnit.SECONDS.sleep(10);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(AutoPrint.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        }
+        ap.iniciarDemonio();
 
     }
 }
