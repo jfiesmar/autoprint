@@ -5,6 +5,7 @@ import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -12,21 +13,46 @@ import java.util.logging.Logger;
 
 public class AutoPrint {
 
-    public void listarDirectorio() throws IOException {
-        File dir = new File("c:/prueba");
-        String[] ficheros = dir.list();
-        if (ficheros == null) {
-            System.out.println("No hay ficheros en el directorio especificado");
-        } else {
-            for (String fichero : ficheros) {
-                System.out.println(fichero);
-                imprimir(fichero);
-                
+    public final String DIRECTORIO = "C:/autoprint";
+    public final String FORMATO = ".pdf";
+    FilenameFilter filter;
+
+    public AutoPrint() {
+        this.filter = new FilenameFilter() {
+            @Override
+            public boolean accept(File file, String name) {
+                if (name.endsWith(FORMATO)) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
-        }
+        };
     }
 
-    public void imprimir(String fichero) throws IOException {
+    public File[] listarDirectorio() throws IOException {
+        File dir = new File(DIRECTORIO);
+        File[] ficheros = dir.listFiles(filter);
+        if (ficheros == null) {
+            System.out.println("No hay ficheros en el directorio especificado");
+        }
+        return ficheros;
+
+    }
+
+    public void iniciarDemonio() throws IOException {
+        File[] listaFicheros = listarDirectorio();
+        for (File fichero : listaFicheros) {
+            System.out.println(fichero);
+            imprimir(fichero);
+            borrarFichero(fichero);
+        }
+
+    }
+
+    /*   
+     */
+    public void imprimir(File fichero) throws IOException {
         FileInputStream inputStream = null;
         try {
             inputStream = new FileInputStream(fichero);
@@ -57,9 +83,11 @@ public class AutoPrint {
         }
 
         inputStream.close();
-        File f = new File (fichero);
-        f.delete();
-        
+
+    }
+
+    public void borrarFichero(File fichero) {
+        fichero.delete();
     }
 
     public static void main(String args[]) throws IOException {
@@ -67,7 +95,7 @@ public class AutoPrint {
         AutoPrint ap = new AutoPrint();
 
         while (true) {
-            ap.listarDirectorio();
+            ap.iniciarDemonio();
             try {
                 TimeUnit.SECONDS.sleep(10);
             } catch (InterruptedException ex) {
