@@ -29,6 +29,10 @@ public class AutoPrint {
                 }
             }
         };
+        
+        
+        Ini ini = new Ini(new File("/ini.txt"));
+        System.out.println(ini.get("parametros", "directorio"));
     }
 
     public File[] listarDirectorio() throws IOException {
